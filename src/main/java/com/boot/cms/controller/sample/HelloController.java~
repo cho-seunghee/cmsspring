@@ -1,0 +1,23 @@
+package com.boot.cms.controller.sample;
+
+import com.boot.cms.mapper.SampleMapper;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api")
+public class HelloController {
+
+    @Autowired
+    private final SampleMapper sampleMapper;
+
+    @GetMapping("/hello")
+    public String helloWorld() {
+
+        System.out.println("Hello, World!");
+        return "Hello, World!";
+    }
+}
