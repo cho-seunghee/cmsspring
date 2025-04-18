@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.boot.cms.mapper")
+@MapperScan("com.boot.cms.mapper.**")
 public class CmsApplication {
 
 	public static void main(String[] args) {

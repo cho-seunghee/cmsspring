@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.boot.cms.mapper.sample.MybaitsXmlMethodMapper">
-    <select id="findByIdXml" parameterType="string" resultType="com.boot.cms.entity.MybaitsClassMethodEntity">
+    <select id="findByIdXml" parameterType="string" resultType="com.boot.cms.entity.MybaitsXmlMethodEntity">
         SELECT userid, usernm
         FROM tb_userinfo_exam
         WHERE userid = #{userId}

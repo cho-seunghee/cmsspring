@@ -43,9 +43,9 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	// JWT (JSON Web Token 관리 및 처리)
-//	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-//	implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-//	implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+	implementation "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+	implementation "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
 	// 테스트 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'      // 기본 테스트

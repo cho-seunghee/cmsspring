@@ -1,13 +1,14 @@
 package com.boot.cms.controller.sample;
 
 import com.boot.cms.entity.MybaitsClassMethodEntity;
+import com.boot.cms.entity.MybaitsXmlMethodEntity;
 import com.boot.cms.mapper.sample.MybaitsXmlMethodMapper;
 import com.boot.cms.service.sample.MybaitsClassMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/sample")
+@RequestMapping("/api/public/sample")
 public class MybaitsClassMethodController {
     @Autowired
     private MybaitsClassMethodService service;
@@ -25,7 +26,7 @@ public class MybaitsClassMethodController {
     // http://localhost:8080/api/sample/findByIdXml?userId=admin
     // xm에서 sql 구현 시
     @GetMapping("/findByIdXml")
-    public MybaitsClassMethodEntity findByIdXml(@RequestParam("userId") String userId) {
+    public MybaitsXmlMethodEntity findByIdXml(@RequestParam("userId") String userId) {
         return mybaitsXmlMethodMapper.findByIdXml(userId);
     }
 }
