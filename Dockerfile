@@ -24,7 +24,7 @@ COPY src src
 RUN ./gradlew clean bootJar --no-daemon
 
 # ---- Runtime Stage ----
-FROM openjdk:21-jdk-bullseye AS runner  # 동일한 JDK 버전 사용
+FROM openjdk:21-jdk-bullseye AS runner
 
 WORKDIR /app
 
