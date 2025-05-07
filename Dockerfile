@@ -1,5 +1,5 @@
 # ---- Build Stage ----
-FROM openjdk:21-jdk-bullseye AS builder  # JDK 17로 변경하여 안정성 확보 (필요 시 21 사용 가능)
+FROM openjdk:21-jdk-bullseye AS builder
 
 USER root
 
