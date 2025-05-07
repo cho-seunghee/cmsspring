@@ -2,19 +2,18 @@
 /build/
 /target/
 /out/
-/.gradle/
 *.class
 *.jar
 *.war
 *.ear
 
 # 환경 파일
+.env
 .env.dev
 
 # Gradle 캐시
-.gradle/
-build/
-.gradle/**
+.gradle/build/
+.gradle/cache/
 
 # IDE 관련 파일
 .idea/
@@ -33,9 +32,10 @@ logs/
 application-local.yml
 application-dev.yml
 application-prod.yml
-*.properties
 *.yml
 !application.yml
+!application.properties
+!gradle.properties
 
 # 테스트 및 임시 파일
 *.swp

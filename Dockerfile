@@ -4,10 +4,11 @@ FROM openjdk:21-jdk AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy Gradle Wrapper and configuration
+# Copy Gradle Wrapper, configuration, and properties
 COPY gradle/ /app/gradle/
 COPY gradlew /app/
 COPY build.gradle /app/
+COPY gradle.properties /app/
 
 # Copy source code
 COPY src /app/src
@@ -15,8 +16,8 @@ COPY src /app/src
 # Make Gradle Wrapper executable
 RUN chmod +x gradlew
 
-# Build the application (skip tests, increase memory)
-RUN ./gradlew build --no-daemon -x test -Dorg.gradle.jvmargs="-Xmx2g -Xms512m" || { echo "Gradle build failed"; exit 1; }
+# Build the application with verbose output and forced dependency refresh
+RUN ./gradlew build --no-daemon -x test --stacktrace --info --refresh-dependencies -Dorg.gradle.jvmargs="-Xmx2g -Xms512m" || { echo "Gradle build failed"; cat build/reports/*; exit 1; }
 
 # Use OpenJDK 21 slim for running
 FROM openjdk:21-jdk-slim
