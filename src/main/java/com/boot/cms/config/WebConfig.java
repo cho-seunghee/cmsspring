@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig {
 
+    /*
     @Value("${cors.allowed-origins}")
     private String[] allowedOrigins;
 
@@ -38,4 +39,6 @@ public class WebConfig {
             }
         };
     }
+
+ */
 }
