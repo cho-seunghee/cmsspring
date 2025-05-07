@@ -10,19 +10,32 @@ RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/
 WORKDIR /app
 
 # Gradle 설정 파일과 스크립트 복사
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
-COPY gradle.properties .
+COPY gradle/ /app/gradle/
+COPY gradlew /app/
+COPY build.gradle /app/
+COPY settings.gradle /app/
+COPY gradle.properties /app/
+
+RUN ls -la /app && ls -la /app/gradle/wrapper/
+
+#COPY gradlew .
+#COPY gradle gradle
+#COPY build.gradle .
+#COPY settings.gradle .
+#COPY gradle.properties .
 # Gradle Wrapper 실행 권한 부여
 RUN chmod +x gradlew
 
+RUN ./gradlew dependencies --no-daemon --stacktrace --info --debug || { echo "Dependency resolution failed"; exit 1; }
+
+
 # 소스 코드 복사
-COPY src src
+#COPY src src
+COPY src /app/src
 
 # Gradle 빌드: JAR 파일 생성
-RUN ./gradlew clean bootJar --no-daemon
+#RUN ./gradlew clean bootJar --no-daemon
+RUN ./gradlew clean bootJar --no-daemon --stacktrace --info --debug --refresh-dependencies -Dorg.gradle.jvmargs="-Xmx2g -Xms512m" || { echo "Gradle build failed"; cat build/reports/*; exit 1; }
 
 # ---- Runtime Stage ----
 FROM openjdk:21-jdk-bullseye AS runner

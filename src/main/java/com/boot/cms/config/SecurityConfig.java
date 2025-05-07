@@ -11,9 +11,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.core.env.Environment;
 
 @Configuration
 public class SecurityConfig {
+
+    private final Environment environment;
+
+    // Environment 객체를 통해 로컬/프로덕션(Runtime 환경) 분기 처리
+    public SecurityConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
@@ -25,6 +33,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Render와 로컬 환경을 구분하여 HTTPS 리디렉션 처리
+        boolean isRender = isRenderEnvironment();
+        if (isRender) {
+            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+        }
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf
@@ -49,6 +63,11 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    private boolean isRenderEnvironment() {
+        String env = environment.getProperty("PORT"); // Render는 PORT 환경 변수 설정
+        return env != null && !env.isEmpty();
     }
 
     @Bean
