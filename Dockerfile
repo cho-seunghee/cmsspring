@@ -1,34 +1,38 @@
-FROM openjdk:21-jdk-bullseye AS builder
+# ---- Build Stage ----
+FROM openjdk:21-jdk-bullseye AS builder  # JDK 17로 변경하여 안정성 확보 (필요 시 21 사용 가능)
 
 USER root
 
-# 시스템 패키지 설치
+# 필수 시스템 패키지 설치
 RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# Gradle 파일 복사 및 실행 권한 부여
+# Gradle 설정 파일과 스크립트 복사
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 COPY gradle.properties .
-RUN chmod +x gradlew  # ← 여기!
+RUN chmod +x gradlew  # Gradle Wrapper 실행 권한 부여
 
 # 소스 코드 복사
 COPY src src
 
-# Gradle 빌드
+# Gradle 빌드: JAR 파일 생성
 RUN ./gradlew clean bootJar --no-daemon
 
-# 실행 스테이지
-FROM openjdk:21-jdk-bullseye AS runner
+# ---- Runtime Stage ----
+FROM openjdk:21-jdk-bullseye AS runner  # 동일한 JDK 버전 사용
 
 WORKDIR /app
 
+# 빌드 스테이지에서 생성된 JAR 파일 복사
 COPY --from=builder /app/build/libs/*.jar app.jar
 
+# 컨테이너 외부로 노출할 포트 설정
 EXPOSE 8080
 
+# 애플리케이션 실행 명령 설정
 ENTRYPOINT ["java", "-jar", "app.jar"]
