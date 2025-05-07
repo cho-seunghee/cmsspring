@@ -1,0 +1,30 @@
+<configuration>
+    <!-- 콘솔 출력 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 날짜별 로그 파일 생성 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 로그 생성 경로와 파일 이름 설정 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 날짜별 폴더와 파일 생성 -->
+            <fileNamePattern>logs/%d{yyyyMMdd}/app_%d{yyyyMMdd}.log</fileNamePattern>
+            <!-- 로그 보관 기간 (예: 30일) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <!-- 로그 메시지 출력 포맷 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 루트 로거 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

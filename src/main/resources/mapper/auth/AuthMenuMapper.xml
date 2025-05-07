@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.cms.mapper.auth.AuthMenuMapper">
+    <select id="findByMenu" parameterType="string" resultType="com.boot.cms.entity.auth.AuthMenuEntity">
+        SELECT
+             c.MENUID
+            ,c.MENUNM
+            ,c.UPPERMENUID
+            ,c.MENULEVEL
+            ,c.MENUORDER
+            ,c.URL
+        FROM tb_userauthgroup a
+        JOIN tb_authgroupmenu b ON a.AUTHID = b.AUTHID AND b.USEYN = "Y"
+        JOIN v_menuinfo c ON b.MENUID = c.MENUID AND c.USEYN = "Y"
+        WHERE a.EMPNO = #{userId}
+    </select>
+</mapper>

@@ -8,6 +8,9 @@
 *.war
 *.ear
 
+# 환경 파일
+.env.dev
+
 # Gradle 캐시
 .gradle/
 build/

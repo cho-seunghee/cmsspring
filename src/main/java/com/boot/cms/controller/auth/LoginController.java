@@ -1,0 +1,69 @@
+package com.boot.cms.controller.auth;
+
+import com.boot.cms.aspect.ClientIPAspect;
+import com.boot.cms.dto.common.ApiResponse;
+import com.boot.cms.entity.auth.LoginEntity;
+import com.boot.cms.service.auth.LoginService;
+import com.boot.cms.util.JwtUtil;
+import com.boot.cms.util.ResponseEntityUtil;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("api/auth")
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final LoginService loginService;
+    private final JwtUtil jwtUtil;
+    private final ResponseEntityUtil responseEntityUtil;
+
+    @PostMapping("login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody Map<String, String> request) {
+        String empNo = request.get("empNo");
+        String empPwd = request.get("empPwd");
+
+        System.out.println("Login attempt: empNo=" + empNo);
+
+        if (empNo == null || empPwd == null) {
+            return responseEntityUtil.okBodyEntity(null, "01", "아이디와 비밀번호는 필수입니다.");
+        }
+
+        try {
+            LoginEntity loginEntity = loginService.loginCheck(empNo, empPwd);
+
+            if (loginEntity != null) {
+                String clientIP = ClientIPAspect.getClientIP();
+                loginEntity.setClientIP(clientIP); // LoginEntity에 clientIP 설정
+                String token = jwtUtil.generateToken(empNo, loginEntity.getAuth(), loginEntity.getEmpNm());
+                Claims claims = jwtUtil.validateToken(token);
+
+                Map<String, Object> userInfo = new HashMap<>();
+                userInfo.put("empNo", loginEntity.getEmpNo());
+                userInfo.put("empNm", loginEntity.getEmpNm());
+                userInfo.put("auth", loginEntity.getAuth());
+                userInfo.put("ip", clientIP);
+
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("token", token);
+                responseData.put("user", userInfo);
+                responseData.put("expiresAt", claims.getExpiration().getTime() / 1000);
+
+                return responseEntityUtil.okBodyEntity(responseData);
+            } else {
+                return responseEntityUtil.okBodyEntity(null, "01", "아이디 또는 비밀번호가 잘못되었습니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("Login failed: " + e.getMessage());
+            return responseEntityUtil.errBodyEntity("로그인 처리 중 오류 발생: " + e.getMessage(), 500);
+        }
+    }
+}

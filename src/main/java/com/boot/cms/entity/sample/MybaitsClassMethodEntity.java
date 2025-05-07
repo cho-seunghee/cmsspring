@@ -1,9 +1,9 @@
-package com.boot.cms.entity;
+package com.boot.cms.entity.sample;
 
 import lombok.Data;
 
 @Data
-public class MybaitsXmlMethodEntity {
+public class MybaitsClassMethodEntity {
     private String userid;
     private String usernm;
 

@@ -1,6 +1,6 @@
 package com.boot.cms.mapper.sample;
 
-import com.boot.cms.entity.MybaitsClassMethodEntity;
+import com.boot.cms.entity.sample.MybaitsClassMethodEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

@@ -1,20 +1,20 @@
 package com.boot.cms.controller.sample;
 
-import com.boot.cms.entity.MybaitsClassMethodEntity;
-import com.boot.cms.entity.MybaitsXmlMethodEntity;
+import com.boot.cms.entity.sample.MybaitsClassMethodEntity;
+import com.boot.cms.entity.sample.MybaitsXmlMethodEntity;
 import com.boot.cms.mapper.sample.MybaitsXmlMethodMapper;
 import com.boot.cms.service.sample.MybaitsClassMethodService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/public/sample")
+@RequiredArgsConstructor
 public class MybaitsClassMethodController {
-    @Autowired
-    private MybaitsClassMethodService service;
+    private final MybaitsClassMethodService service;
 
-    @Autowired
-    private MybaitsXmlMethodMapper mybaitsXmlMethodMapper;
+    private final MybaitsXmlMethodMapper mybaitsXmlMethodMapper;
 
     // http://localhost:8080/api/sample/find/admin
     // 자바코드에서 sql 구현 시
