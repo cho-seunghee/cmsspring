@@ -1,41 +1,37 @@
-# Use OpenJDK 21 for building
+# 1단계: 빌드 스테이지
 FROM openjdk:21-jdk AS builder
 
-# Set working directory
-WORKDIR /app
-
-# Install findutils to provide xargs
+# 시스템 패키지 설치
+USER root
 RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
 
-# Copy Gradle Wrapper, configuration, and properties
-COPY gradle/ /app/gradle/
-COPY gradlew /app/
-COPY build.gradle /app/
-COPY gradle.properties /app/
+# 작업 디렉토리 설정
+WORKDIR /app
 
-# Verify copied files
-RUN ls -la /app && ls -la /app/gradle/wrapper/
+# Gradle 관련 파일 복사
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY gradle.properties .
 
-# Make Gradle Wrapper executable
-RUN chmod +x gradlew
+# 소스 복사
+COPY src src
 
-# Download dependencies (cache layer)
-RUN ./gradlew dependencies --no-daemon --stacktrace --info --debug || { echo "Dependency resolution failed"; exit 1; }
+# Gradle 빌드
+RUN ./gradlew clean bootJar --no-daemon
 
-# Copy source code
-COPY src /app/src
+# 2단계: 실행 스테이지
+FROM openjdk:21-jdk-slim AS runner
 
-# Build the application with verbose output
-RUN ./gradlew build --no-daemon -x test --stacktrace --info --debug --refresh-dependencies -Dorg.gradle.jvmargs="-Xmx2g -Xms512m" || { echo "Gradle build failed"; cat build/reports/*; exit 1; }
+# 작업 디렉토리 설정
+WORKDIR /app
 
-# Use OpenJDK 21 slim for running
-FROM openjdk:21-jdk-slim
+# 빌드된 JAR 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Copy the built JAR from the builder stage
-COPY --from=builder /app/build/libs/cms-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose port 8080 (default for Spring Boot)
+# 포트 노출 (필요 시)
 EXPOSE 8080
 
-# Run the JAR
+# 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
