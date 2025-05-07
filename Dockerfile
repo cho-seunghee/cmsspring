@@ -1,8 +1,10 @@
-# 1단계: 빌드 스테이지
-FROM openjdk:21-jdk AS builder
+# 빌드 스테이지: Debian 기반 openjdk 이미지 사용
+FROM eclipse-temurin:21-jdk AS builder
 
-# 시스템 패키지 설치
+# 패키지 설치를 위한 root 권한
 USER root
+
+# findutils 설치 (xargs 등 포함)
 RUN apt-get update && apt-get install -y findutils && rm -rf /var/lib/apt/lists/*
 
 # 작업 디렉토리 설정
@@ -21,17 +23,13 @@ COPY src src
 # Gradle 빌드
 RUN ./gradlew clean bootJar --no-daemon
 
-# 2단계: 실행 스테이지
-FROM openjdk:21-jdk-slim AS runner
+# 실행 스테이지
+FROM eclipse-temurin:21-jdk-slim AS runner
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드된 JAR 복사
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# 포트 노출 (필요 시)
 EXPOSE 8080
 
-# 애플리케이션 실행
 ENTRYPOINT ["java", "-jar", "app.jar"]
