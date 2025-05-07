@@ -1,22 +1,19 @@
-# Use OpenJDK 21 for building
-FROM openjdk:21-jdk AS builder
+# Use Gradle 8.10 with JDK 21 for building
+FROM gradle:8.13-jdk21 AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Copy Gradle Wrapper and configuration
-COPY gradle/ /app/gradle/
-COPY gradlew /app/
+# Copy Gradle configuration file (Groovy DSL)
 COPY build.gradle /app/
+COPY gradle/wrapper/gradle-wrapper.properties /app/gradle/wrapper/
+COPY gradle/wrapper/gradle-wrapper.jar /app/gradle/wrapper/
 
 # Copy source code
 COPY src /app/src
 
-# Make Gradle Wrapper executable
-RUN chmod +x gradlew
-
-# Build the application (skip tests)
-RUN ./gradlew build --no-daemon -x test
+# Build the application (skip tests for faster builds)
+RUN gradle build --no-daemon -x test
 
 # Use OpenJDK 21 slim for running
 FROM openjdk:21-jdk-slim
