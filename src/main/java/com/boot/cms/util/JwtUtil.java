@@ -3,6 +3,7 @@ package com.boot.cms.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -19,6 +20,7 @@ public class JwtUtil {
     private final Key signingKey;
     private final long expirationTime;
 
+    @Autowired
     public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") long expirationTime) {
         byte[] keyBytes;
         try {
