@@ -35,5 +35,7 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 # 컨테이너 외부로 노출할 포트 설정
 EXPOSE 8080
 
-# 애플리케이션 실행 명령 설정
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Render에서 제공하는 PORT 환경 변수를 사용하도록 Spring Boot에 전달
+ENV PORT=8080
+
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=$PORT -jar app.jar"]
