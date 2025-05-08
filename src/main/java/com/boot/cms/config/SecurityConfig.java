@@ -2,6 +2,7 @@ package com.boot.cms.config;
 
 import com.boot.cms.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +14,13 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.core.env.Environment;
 
+import java.util.Arrays;
+
 @Configuration
 public class SecurityConfig {
 
     private final Environment environment;
 
-    // Environment 객체를 통해 로컬/프로덕션(Runtime 환경) 분기 처리
     public SecurityConfig(Environment environment) {
         this.environment = environment;
     }
@@ -33,7 +35,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Render와 로컬 환경을 구분하여 HTTPS 리디렉션 처리
         boolean isRender = isRenderEnvironment();
         if (isRender) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
@@ -42,15 +43,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/public/**")
-                        .ignoringRequestMatchers("/api/auth/**")
-                        .ignoringRequestMatchers("/api/mapview/**")
+                        .ignoringRequestMatchers("/api/**")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/mapview/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -66,22 +64,38 @@ public class SecurityConfig {
     }
 
     private boolean isRenderEnvironment() {
-        String env = environment.getProperty("PORT"); // Render는 PORT 환경 변수 설정
+        String env = environment.getProperty("PORT");
         return env != null && !env.isEmpty();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin(allowedOrigins);
-        configuration.addAllowedMethod("*");
-        configuration.addAllowedHeader("*");
+        CorsConfiguration configuration = getCorsConfiguration();
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/auth/**", configuration);
-        source.registerCorsConfiguration("/api/mapview/**", configuration);
-        source.registerCorsConfiguration("/api/public/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration); // `/api/**` URL에 CORS 설정 적용
         return source;
+    }
+
+    @NotNull
+    private CorsConfiguration getCorsConfiguration() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        String[] originsArray = allowedOrigins.split(",");
+        System.out.println("allowedOrigins: " + String.join(", ", originsArray)); // 디버깅 로그
+
+        for (String origin : originsArray) {
+            String trimmedOrigin = origin.trim();
+            if (!trimmedOrigin.isEmpty()) {
+                configuration.addAllowedOrigin(trimmedOrigin);
+            }
+        }
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        return configuration;
     }
 }
