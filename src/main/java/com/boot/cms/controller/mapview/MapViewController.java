@@ -6,7 +6,10 @@ import com.boot.cms.util.EscapeUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -25,22 +28,26 @@ public class MapViewController {
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> callDynamicView(
             @RequestBody Map<String, String> request
     ) {
+        // Extract rptCd and jobGb from request
         String rptCd = request.get("rptCd");
+        String jobGb = request.getOrDefault("jobGb", "GET"); // Fallback to "GET" if not provided
+        String empNo = request.getOrDefault("empNo", "admin"); // Hardcoded or from request
+
+        // Validate rptCd
         if (rptCd == null || rptCd.isEmpty()) {
             return responseEntityUtil.okBodyEntity(null, "01", "파라미터가 잘못되어 있습니다.");
         }
 
-        // Extract and escape parameters excluding rptCd
+        // Extract params (all key-value pairs except rptCd, jobGb, empNo)
         List<String> params = request.entrySet().stream()
-                .filter(entry -> !"rptCd".equals(entry.getKey())) // rptCd 필터링
-                .sorted(Map.Entry.comparingByKey())              // 키 기준 정렬
-                .map(entry -> escapeUtil.escape(entry.getValue())) // Escape each parameter
+                .filter(entry -> !List.of("rptCd", "jobGb", "empNo").contains(entry.getKey()))
+                .map(entry -> escapeUtil.escape(entry.getValue()))
                 .collect(Collectors.toList());
 
-        // Process dynamic view using MapViewProcessor
+        // Process dynamic view
         List<Map<String, Object>> unescapedResultList;
         try {
-            unescapedResultList = mapViewProcessor.processDynamicView(rptCd, params);
+            unescapedResultList = mapViewProcessor.processDynamicView(rptCd, params, empNo, jobGb);
         } catch (IllegalArgumentException e) {
             return responseEntityUtil.okBodyEntity(null, "01", e.getMessage());
         }

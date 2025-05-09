@@ -1,19 +1,34 @@
 package com.boot.cms.entity.mapview;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 @Entity
-@Table(name = "tb_map_view")
+@Getter
+@Setter
 public class MapViewEntity {
-    @Id
-    @Column(name = "RPTCD")
-    private String rptCd;
 
+    @Column(name = "ERRCD")
+    private String errCd;
+
+    @Column(name = "ERRMSG")
+    private String errMsg;
+
+    @Id
     @Column(name = "JOBNM")
     private String jobNm;
 
+    @Column(name = "JOBTYPE")
+    private String jobType;
+
     @Column(name = "PARAMCNT")
     private int paramCnt;
+
+    @Transient
+    private String dynamicCall; // Transient field for dynamic call string
 }

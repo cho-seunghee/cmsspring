@@ -8,7 +8,7 @@ public class EscapeUtil {
     /**
      * 입력값에 포함된 특수문자를 특정 유니코드 기호로 치환합니다.
      */
-    public static String escape(String str) {
+    public String escape(String str) {
         if (str == null || str.isEmpty()) {
             return str;
         }

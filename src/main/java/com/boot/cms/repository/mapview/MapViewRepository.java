@@ -1,13 +1,24 @@
 package com.boot.cms.repository.mapview;
 
 import com.boot.cms.entity.mapview.MapViewEntity;
+import jakarta.persistence.Column;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MapViewRepository extends JpaRepository<MapViewEntity, String> {
 
-    @Query(value = "SELECT RPTCD as rptCd, JOBNM as jobNm, PARAMCNT as paramCnt FROM tb_map_view WHERE RPTCD = :rptCd", nativeQuery = true)
-    MapViewEntity findMapViewInfoByRptCd(String rptCd);
+    @Query(value = "CALL UP_MAPVIEW_SELECT(:pEMPNO, :pIP, :pRPTCD, :pJOBGB, :pPARAMS, :pUSERCONGB, :pUSERAGENT);", nativeQuery = true)
+    MapViewEntity findMapViewInfoByRptCd(
+            String pEMPNO,
+            String pIP,
+            String pRPTCD,
+            String pJOBGB,
+            String pPARAMS,
+            String pUSERCONGB,
+            String pUSERAGENT
+    );
 }
