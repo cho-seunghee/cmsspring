@@ -22,7 +22,10 @@ public class MapViewService {
         String pParams = "";
         if (uiParams.size() >= 2) {
             pParams = uiParams.stream()
-                    .collect(Collectors.joining("|"));
+                    .collect(Collectors.joining("│"));
+        }
+        else {
+            pParams = uiParams.get(0);
         }
 
         MapViewEntity procInfo = mapViewRepository.findMapViewInfoByRptCd(empNo, ip, rptCd, jobGb, pParams, userCongb, userAgent);
