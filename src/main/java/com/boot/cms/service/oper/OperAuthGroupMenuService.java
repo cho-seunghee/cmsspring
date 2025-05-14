@@ -141,7 +141,7 @@ public class OperAuthGroupMenuService {
             }
 
             List<Map<String, Object>> authChildren = new ArrayList<>(authMap.values());
-            authChildren.sort(Comparator.comparing(m -> (String) m.get("AUTHNM")));
+            authChildren.sort(Comparator.comparing(m -> (String) m.get("AUTHID"))); // Changed to sort by AUTHID
             node.put("children", authChildren);
 
             nodeMap.put(menuId, node);

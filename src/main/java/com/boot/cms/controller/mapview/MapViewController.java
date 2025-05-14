@@ -53,7 +53,7 @@ public class MapViewController {
         }
 
         if (unescapedResultList.isEmpty()) {
-            return responseEntityUtil.okBodyEntity(null, "01", "조회 결과 없습니다.");
+            return responseEntityUtil.okBodyEntity(null, "01", "조회 결과가 없습니다.");
         }
 
         return responseEntityUtil.okBodyEntity(unescapedResultList);

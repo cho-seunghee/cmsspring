@@ -77,7 +77,7 @@ public class NoticeController {
             List<Map<String, Object>> resultList = loadNotices();
 
             if (resultList.isEmpty()) {
-                return responseEntityUtil.okBodyEntity(null, "01", "조회 결과 없습니다.");
+                return responseEntityUtil.okBodyEntity(null, "01", "조회 결과가 없습니다.");
             }
             return responseEntityUtil.okBodyEntity(resultList);
         } catch (Exception e) {

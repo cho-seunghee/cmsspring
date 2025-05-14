@@ -2,71 +2,50 @@ package com.boot.cms.controller.oper;
 
 import com.boot.cms.dto.common.ApiResponse;
 import com.boot.cms.service.mapview.MapViewProcessor;
-import com.boot.cms.service.oper.OperAuthGroupMenuService;
 import com.boot.cms.util.EscapeUtil;
 import com.boot.cms.util.MapViewParamsUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
-//@RequestMapping("api/public/oper/menuauthinfo") // postman 테스트 시
-@RequestMapping("api/oper/menuauthinfo")
+//@RequestMapping("api/public/oper/menumng") // postman 테스트 시
+@RequestMapping("api/oper/menumng")
 @RequiredArgsConstructor
-public class OperAuthGroupMenuController {
+public class OperMenuMngController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OperAuthGroupMenuController.class);
-
-    private final OperAuthGroupMenuService operAuthGroupMenuService;
     private final MapViewProcessor mapViewProcessor;
     private final ResponseEntityUtil responseEntityUtil;
     private final EscapeUtil escapeUtil;
     private final MapViewParamsUtil mapViewParamsUtil;
 
     @PostMapping("/list")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> menuAuthList(
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> menuMngList(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "OPERAUTHGROUPMENU";
+        String rptCd = "OPERMENUMNG";
         String jobGb = "GET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
         String empNo = claims != null && claims.getSubject() != null ? claims.getSubject() : null;
-        //        empNo = "test"; // postman 테스트 시
+//        empNo = "test"; // postman 테스트 시
 
-        List<String> params;
-        Object paramsObj = request.get("params");
-        if (paramsObj instanceof Map && !((Map<?, ?>) paramsObj).isEmpty()) {
-            Map<String, String> paramsMap = (Map<String, String>) paramsObj;
-            params = paramsMap.values().stream()
-                    .map(escapeUtil::escape)
-                    .collect(Collectors.toList());
-        } else if (!request.isEmpty()) {
-            params = request.entrySet().stream()
-                    .map(entry -> escapeUtil.escape(String.valueOf(entry.getValue())))
-                    .collect(Collectors.toList());
-        } else {
-            params = List.of(escapeUtil.escape("F"));
-        }
+        List<String> params = mapViewParamsUtil.getParams(request, escapeUtil);
 
         List<Map<String, Object>> unescapedResultList;
         try {
-            unescapedResultList = operAuthGroupMenuService.processDynamicView(rptCd, params, empNo, jobGb);
+            unescapedResultList = mapViewProcessor.processDynamicView(rptCd, params, empNo, jobGb);
         } catch (IllegalArgumentException e) {
-            logger.error("Error processing dynamic view: {}", e.getMessage());
             return responseEntityUtil.okBodyEntity(null, "01", e.getMessage());
         }
 
@@ -78,11 +57,11 @@ public class OperAuthGroupMenuController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> menuAuthSave(
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> menuMngSave(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "OPERAUTHGROUPMENUTRAN";
+        String rptCd = "OPERMENUMNGTRAN";
         String jobGb = "SET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
