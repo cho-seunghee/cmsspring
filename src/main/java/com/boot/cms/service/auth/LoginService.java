@@ -28,10 +28,9 @@ public class LoginService {
         try {
             LoginEntity cachedUser = redisTemplate.opsForValue().get(cacheKey);
             if (cachedUser != null) {
-                System.out.println("Cache hit for user: " + empNo);
                 return cachedUser;
             }
-            System.out.println("Cache miss for user: " + empNo);
+
         } catch (RedisConnectionFailureException e) {
             System.out.println("Redis connection failed, falling back to DB: " + e.getMessage());
         }

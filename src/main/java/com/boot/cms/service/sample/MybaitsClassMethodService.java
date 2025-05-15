@@ -11,9 +11,7 @@ public class MybaitsClassMethodService {
     private MybaitsClassMethodMapper mapper;
 
     public MybaitsClassMethodEntity findById(String id) {
-        System.out.println("Service: Testing findById(" + id + "):");
         MybaitsClassMethodEntity entity = mapper.findById(id);
-        System.out.println("Service: Result: " + entity);
         return entity;
     }
 }

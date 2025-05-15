@@ -24,8 +24,6 @@ public class ClientIPAspect {
             ip = "127.0.0.1";
         }
 
-        System.out.println("Client IP: " + ip);
-
         return ip;
     }
 }

@@ -3,6 +3,8 @@ package com.boot.cms.controller.auth;
 import com.boot.cms.aspect.ClientIPAspect;
 import com.boot.cms.dto.common.ApiResponse;
 import com.boot.cms.entity.auth.LoginEntity;
+import com.boot.cms.entity.auth.LoginResultEntity;
+import com.boot.cms.service.auth.LoginResultService;
 import com.boot.cms.service.auth.LoginService;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
@@ -25,13 +27,12 @@ public class LoginController {
     private final LoginService loginService;
     private final JwtUtil jwtUtil;
     private final ResponseEntityUtil responseEntityUtil;
+    private final LoginResultService loginResultService;
 
     @PostMapping("login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody Map<String, String> request) {
         String empNo = request.get("empNo");
         String empPwd = request.get("empPwd");
-
-        System.out.println("Login attempt: empNo=" + empNo);
 
         if (empNo == null || empPwd == null) {
             return responseEntityUtil.okBodyEntity(null, "01", "아이디와 비밀번호는 필수입니다.");
@@ -45,6 +46,16 @@ public class LoginController {
                 loginEntity.setClientIP(clientIP); // LoginEntity에 clientIP 설정
                 String token = jwtUtil.generateToken(empNo, loginEntity.getAuth(), loginEntity.getEmpNm());
                 Claims claims = jwtUtil.validateToken(token);
+
+                // loginResultService 호출
+                Map<String, Object> procedureResult = loginResultService.callLoginProcedure(empNo, clientIP);
+                LoginResultEntity loginResult = new LoginResultEntity();
+                loginResult.setErrCd((String) procedureResult.get("errCd"));
+                loginResult.setErrMsg((String) procedureResult.get("errMsg"));
+
+                if (!"00".equals(loginResult.getErrCd())) {
+                    return responseEntityUtil.okBodyEntity(null, "01", "로그인 프로시저 처리 실패: " + loginResult.getErrMsg());
+                }
 
                 Map<String, Object> userInfo = new HashMap<>();
                 userInfo.put("empNo", loginEntity.getEmpNo());

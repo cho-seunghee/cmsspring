@@ -1,12 +1,9 @@
 package com.boot.cms.repository.mapview;
 
 import com.boot.cms.entity.mapview.MapViewEntity;
-import jakarta.persistence.Column;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface MapViewRepository extends JpaRepository<MapViewEntity, String> {

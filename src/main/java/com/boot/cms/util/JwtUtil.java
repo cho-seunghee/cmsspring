@@ -33,7 +33,7 @@ public class JwtUtil {
         }
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationTime = expirationTime;
-        System.out.println("JWT expiration: " + this.expirationTime + "ms");
+
     }
 
     public Key getSigningKey() {
@@ -55,7 +55,7 @@ public class JwtUtil {
                 .setExpiration(expiryDate)
                 .signWith(signingKey)
                 .compact();
-        System.out.println("Generated token, expires at: " + (expiryDate.getTime() / 1000));
+
         return token;
     }
 

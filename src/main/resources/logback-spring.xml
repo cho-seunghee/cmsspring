@@ -12,8 +12,10 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 날짜별 폴더와 파일 생성 -->
             <fileNamePattern>logs/%d{yyyyMMdd}/app_%d{yyyyMMdd}.log</fileNamePattern>
-            <!-- 로그 보관 기간 (예: 30일) -->
-            <maxHistory>30</maxHistory>
+            <!-- 로그 보관 기간: 7일 -->
+            <maxHistory>7</maxHistory>
+            <!-- 전체 로그 크기 제한 -->
+            <totalSizeCap>50MB</totalSizeCap>
         </rollingPolicy>
 
         <!-- 로그 메시지 출력 포맷 -->
