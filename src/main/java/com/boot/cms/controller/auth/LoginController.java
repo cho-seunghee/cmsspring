@@ -9,6 +9,8 @@ import com.boot.cms.service.auth.LoginService;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +32,9 @@ public class LoginController {
     private final LoginResultService loginResultService;
 
     @PostMapping("login")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(
+            @RequestBody Map<String, String> request,
+            HttpServletResponse response) {
         String empNo = request.get("empNo");
         String empPwd = request.get("empPwd");
 
@@ -43,11 +47,15 @@ public class LoginController {
 
             if (loginEntity != null) {
                 String clientIP = ClientIPAspect.getClientIP();
-                loginEntity.setClientIP(clientIP); // LoginEntity에 clientIP 설정
+                loginEntity.setClientIP(clientIP);
                 String token = jwtUtil.generateToken(empNo, loginEntity.getAuth(), loginEntity.getEmpNm());
                 Claims claims = jwtUtil.validateToken(token);
 
-                // loginResultService 호출
+                // Set HTTP-only cookie
+                Cookie jwtCookie = jwtUtil.createJwtCookie(token);
+                response.addCookie(jwtCookie);
+
+                // loginResultService call
                 Map<String, Object> procedureResult = loginResultService.callLoginProcedure(empNo, clientIP);
                 LoginResultEntity loginResult = new LoginResultEntity();
                 loginResult.setErrCd((String) procedureResult.get("errCd"));
@@ -64,7 +72,6 @@ public class LoginController {
                 userInfo.put("ip", clientIP);
 
                 Map<String, Object> responseData = new HashMap<>();
-                responseData.put("token", token);
                 responseData.put("user", userInfo);
                 responseData.put("expiresAt", claims.getExpiration().getTime() / 1000);
 

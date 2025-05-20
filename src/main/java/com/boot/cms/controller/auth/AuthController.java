@@ -7,6 +7,9 @@ import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +28,13 @@ public class AuthController {
 
     @GetMapping("live")
     public ResponseEntity<ApiResponse<Map<String, Object>>> live(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletRequest request,
+            HttpServletResponse response,
             @RequestParam(value = "extend", defaultValue = "false") boolean extend) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return responseEntityUtil.errBodyEntity("Missing or invalid token", 401);
+        String token = jwtUtil.getTokenFromCookie(request);
+        if (token == null) {
+            return responseEntityUtil.errBodyEntity("Missing token", 401);
         }
-
-        String token = authHeader.substring(7);
 
         try {
             Claims claims = authService.validateToken(token);
@@ -52,7 +55,9 @@ public class AuthController {
 
             if (extend) {
                 String newToken = jwtUtil.generateToken(empNo, auth, empNm);
-                responseData.put("token", newToken);
+                Cookie jwtCookie = jwtUtil.createJwtCookie(newToken);
+                response.addCookie(jwtCookie);
+
                 Claims newClaims = Jwts.parserBuilder()
                         .setSigningKey(jwtUtil.getSigningKey())
                         .build()
@@ -65,5 +70,33 @@ public class AuthController {
         } catch (Exception e) {
             return responseEntityUtil.errBodyEntity("Invalid token: " + e.getMessage(), 401);
         }
+    }
+
+    @GetMapping("check")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> check(HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromCookie(request);
+        if (token == null) {
+            return responseEntityUtil.errBodyEntity("Missing token", 401);
+        }
+
+        try {
+            Claims claims = jwtUtil.validateToken(token);
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            return responseEntityUtil.okBodyEntity(responseData);
+        } catch (Exception e) {
+            return responseEntityUtil.errBodyEntity("Invalid token: " + e.getMessage(), 401);
+        }
+    }
+
+    @PostMapping("logout")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> logout(HttpServletResponse response) {
+        Cookie jwtCookie = jwtUtil.createJwtCookie(null);
+        jwtCookie.setMaxAge(0); // Override to expire immediately
+        response.addCookie(jwtCookie);
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("success", true);
+        return responseEntityUtil.okBodyEntity(responseData);
     }
 }

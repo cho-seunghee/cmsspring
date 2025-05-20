@@ -3,12 +3,9 @@ package com.boot.cms.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Base64;
@@ -20,7 +17,6 @@ public class JwtUtil {
     private final Key signingKey;
     private final long expirationTime;
 
-    @Autowired
     public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") long expirationTime) {
         byte[] keyBytes;
         try {
@@ -33,7 +29,6 @@ public class JwtUtil {
         }
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationTime = expirationTime;
-
     }
 
     public Key getSigningKey() {
@@ -47,7 +42,7 @@ public class JwtUtil {
     public String generateToken(String empNo, String auth, String empNm) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(empNo)
                 .claim("auth", auth)
                 .claim("empNm", empNm)
@@ -55,8 +50,6 @@ public class JwtUtil {
                 .setExpiration(expiryDate)
                 .signWith(signingKey)
                 .compact();
-
-        return token;
     }
 
     public Claims validateToken(String token) {
@@ -71,16 +64,32 @@ public class JwtUtil {
         }
     }
 
+    public String getTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public Cookie createJwtCookie(String token) {
+        Cookie jwtCookie = new Cookie("jwt_token", token);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge((int) (expirationTime / 1000)); // Match token expiration
+        jwtCookie.setSecure(true); // Set to true in production (HTTPS)
+        jwtCookie.setAttribute("SameSite", "Lax");
+        return jwtCookie;
+    }
+
+    // Deprecated: Kept for backward compatibility but not used with cookies
+    @Deprecated
     public String getTokenFromHeader() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) {
-            return null;
-        }
-        HttpServletRequest request = attributes.getRequest();
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
+        // Existing header-based method (not used)
         return null;
     }
 }
