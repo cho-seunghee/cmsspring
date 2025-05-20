@@ -3,6 +3,7 @@ package com.boot.cms.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.Cookie;
@@ -14,8 +15,12 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    @Getter
     private final Key signingKey;
     private final long expirationTime;
+
+    @Value("${COOKIE_SECURE:false}")
+    private boolean cookieSecure;
 
     public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") long expirationTime) {
         byte[] keyBytes;
@@ -29,10 +34,6 @@ public class JwtUtil {
         }
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationTime = expirationTime;
-    }
-
-    public Key getSigningKey() {
-        return signingKey;
     }
 
     public long getExpirationTime() {
@@ -81,7 +82,7 @@ public class JwtUtil {
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge((int) (expirationTime / 1000)); // Match token expiration
-        jwtCookie.setSecure(true); // Set to true in production (HTTPS)
+        jwtCookie.setSecure(cookieSecure); // Set to true in production (HTTPS)
         jwtCookie.setAttribute("SameSite", "Lax");
         return jwtCookie;
     }
