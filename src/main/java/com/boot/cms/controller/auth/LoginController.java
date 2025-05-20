@@ -82,6 +82,7 @@ public class LoginController {
         } catch (Exception e) {
             System.out.println("Login failed: " + e.getMessage());
             return responseEntityUtil.errBodyEntity("로그인 처리 중 오류 발생: " + e.getMessage(), 500);
+
         }
     }
 }
