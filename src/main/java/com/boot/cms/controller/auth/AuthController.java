@@ -1,16 +1,27 @@
 package com.boot.cms.controller.auth;
 
 import com.boot.cms.aspect.ClientIPAspect;
-import com.boot.cms.dto.common.ApiResponse;
+import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.service.auth.AuthService;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +31,53 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Endpoints for user authentication and session management")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
     private final JwtUtil jwtUtil;
     private final ResponseEntityUtil responseEntityUtil;
 
+    @Setter
+    @Getter
+    String errorMessage;
+
+    @Operation(summary = "Check user session", description = "Validates the JWT token from the cookie and returns session status")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session is valid", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid token")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("check")
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> check(HttpServletRequest request) {
+        String token = jwtUtil.getTokenFromCookie(request);
+
+        if (token == null) {
+            return responseEntityUtil.errBodyEntity("Missing token", 401);
+        }
+
+        try {
+            Claims claims = jwtUtil.validateToken(token);
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("success", true);
+            return responseEntityUtil.okBodyEntity(responseData);
+        } catch (Exception e) {
+            errorMessage = "Token validation failed in /api/auth/check: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            System.out.println(this.getErrorMessage() + e.getMessage());
+            return responseEntityUtil.errBodyEntity(this.getErrorMessage() + e.getMessage(), 401);
+        }
+    }
+
+    @Operation(summary = "Extend user session", description = "Validates the current JWT token and optionally extends the session by issuing a new token")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session validated or extended", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid token")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("live")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> live(
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> live(
             HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(value = "extend", defaultValue = "false") boolean extend) {
@@ -68,35 +118,20 @@ public class AuthController {
 
             return responseEntityUtil.okBodyEntity(responseData);
         } catch (Exception e) {
-            return responseEntityUtil.errBodyEntity("Invalid token: " + e.getMessage(), 401);
+            errorMessage = "Invalid token: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            return responseEntityUtil.errBodyEntity(this.getErrorMessage() + e.getMessage(), 401);
         }
     }
 
-    @GetMapping("check")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> check(HttpServletRequest request) {
-        String token = jwtUtil.getTokenFromCookie(request);
-        System.out.println("Received token in /api/auth/check: " + token);
-        if (token == null) {
-            System.out.println("No token found in cookie for /api/auth/check");
-            return responseEntityUtil.errBodyEntity("Missing token", 401);
-        }
-
-        try {
-            Claims claims = jwtUtil.validateToken(token);
-            System.out.println("Validated claims: " + claims);
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("success", true);
-            return responseEntityUtil.okBodyEntity(responseData);
-        } catch (Exception e) {
-            System.out.println("Token validation failed in /api/auth/check: " + e.getMessage());
-            return responseEntityUtil.errBodyEntity("Invalid token: " + e.getMessage(), 401);
-        }
-    }
-
+    @Operation(summary = "Logout user", description = "Invalidates the JWT token by setting the cookie to expire")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully logged out", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))
+    })
     @PostMapping("logout")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> logout(HttpServletResponse response) {
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> logout(HttpServletResponse response) {
         Cookie jwtCookie = jwtUtil.createJwtCookie(null);
-        jwtCookie.setMaxAge(0); // Override to expire immediately
+        jwtCookie.setMaxAge(0);
         response.addCookie(jwtCookie);
 
         Map<String, Object> responseData = new HashMap<>();

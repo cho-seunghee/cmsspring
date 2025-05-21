@@ -2,7 +2,9 @@ package com.boot.cms.service.oper;
 
 import com.boot.cms.entity.oper.MenuAuthEntity;
 import com.boot.cms.service.mapview.MapViewProcessor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,10 @@ public class OperAuthGroupMenuService {
 
     private final MapViewProcessor mapViewProcessor;
 
+    @Setter
+    @Getter
+    String errorMessage;
+
     public List<Map<String, Object>> processDynamicView(String rptCd, List<String> params, String empNo, String jobGb) {
         List<Map<String, Object>> unescapedResultList = mapViewProcessor.processDynamicView(rptCd, params, empNo, jobGb);
         List<MenuAuthEntity> entities = unescapedResultList.stream()
@@ -29,7 +35,8 @@ public class OperAuthGroupMenuService {
         try {
             result = convertToHierarchicalFormat(entities);
         } catch (Exception e) {
-            logger.error("Error converting to hierarchical format", e);
+            errorMessage = "Error converting to hierarchical format: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
             return Collections.emptyList();
         }
         return result;
@@ -48,12 +55,14 @@ public class OperAuthGroupMenuService {
             entity.setAuthYn((String) map.getOrDefault("AUTHYN", "Y"));
 
             if (entity.getMenuId().isEmpty()) {
-                logger.warn("Invalid entity data (missing MENUID): {}", map);
+                errorMessage = "Invalid entity data (missing MENUID): {}";
+                logger.warn(this.getErrorMessage(), map);
                 return null;
             }
             return entity;
         } catch (Exception e) {
-            logger.error("Error mapping to MenuAuthEntity: {}", map, e);
+            errorMessage = "Error mapping to MenuAuthEntity: {}";
+            logger.error(this.getErrorMessage(), map, e.getMessage(), e);
             return null;
         }
     }
@@ -69,11 +78,14 @@ public class OperAuthGroupMenuService {
             try {
                 return Integer.parseInt((String) value);
             } catch (NumberFormatException e) {
-                logger.warn("Invalid number format: {}", value);
+                errorMessage = "Invalid number format: {}";
+                logger.warn(this.getErrorMessage(), value, e.getMessage(), e);
                 return 0;
             }
         }
-        logger.warn("Unsupported type for parsing: {}", value.getClass());
+
+        errorMessage = "Unsupported type for parsing: {}";
+        logger.warn(this.getErrorMessage(), value.getClass());
         return 0;
     }
 
@@ -115,7 +127,8 @@ public class OperAuthGroupMenuService {
                     break;
                 default:
                     node.put("MENUNM", menuNm);
-                    logger.warn("Unexpected MENULEVEL {} for MENUID={}", menuLevel, menuId);
+                    errorMessage = "Unexpected MENULEVEL {} for MENUID={}";
+                    logger.warn(this.getErrorMessage(), menuLevel, menuId);
             }
             node.put("MENUORDER", firstRow.getMenuOrder());
             node.put("MENULEVEL", menuLevel);
@@ -179,14 +192,16 @@ public class OperAuthGroupMenuService {
             return levelMap.get(menuId);
         }
         if (visited.contains(menuId)) {
-            logger.warn("Circular reference detected for MENUID={}", menuId);
+            errorMessage = "Circular reference detected for MENUID={}";
+            logger.warn(this.getErrorMessage(), menuId);
             return 1;
         }
         visited.add(menuId);
 
         List<MenuAuthEntity> menuRows = groupedMenus.get(menuId);
         if (menuRows == null || menuRows.isEmpty()) {
-            logger.warn("No data for MENUID={}", menuId);
+            errorMessage = "No data for MENUID={}";
+            logger.warn(this.getErrorMessage(), menuId);
             return 1;
         }
 
@@ -209,7 +224,8 @@ public class OperAuthGroupMenuService {
                              List<Map<String, Object>> flatList) {
         Map<String, Object> node = nodeMap.get(menuId);
         if (node == null) {
-            logger.warn("Node not found for MENUID={}", menuId);
+            errorMessage = "Node not found for MENUID={}";
+            logger.warn(this.getErrorMessage(), menuId);
             return;
         }
         flatList.add(node);

@@ -1,8 +1,19 @@
 package com.boot.cms.controller.notice;
 
-import com.boot.cms.dto.common.ApiResponse;
+import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.util.ResponseEntityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +26,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/notice")
 @RequiredArgsConstructor
+@Tag(name = "Notices", description = "Endpoints for managing notice data")
 public class NoticeController {
+    private static final Logger logger = LoggerFactory.getLogger(NoticeController.class);
 
     private final ResponseEntityUtil responseEntityUtil;
+
+    @Setter
+    @Getter
+    String errorMessage;
 
     public static class NoticeData {
         private int id;
@@ -69,8 +86,16 @@ public class NoticeController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get notice list", description = "Retrieves the list of notices")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Notices retrieved successfully", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "No notices found"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body (optional, can be empty)", content = @Content(schema = @Schema(example = "{}")))
     @PostMapping("/list")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getNoticeList(
+    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> getNoticeList(
             @RequestBody Map<String, String> request
     ) {
         try {
@@ -81,12 +106,22 @@ public class NoticeController {
             }
             return responseEntityUtil.okBodyEntity(resultList);
         } catch (Exception e) {
-            return responseEntityUtil.okBodyEntity(null, "01", "공지 목록 조회 중 오류 발생: " + e.getMessage());
+            errorMessage = "공지 목록 조회 중 오류 발생: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            return responseEntityUtil.okBodyEntity(null, "01", this.getErrorMessage() + e.getMessage());
         }
     }
 
+    @Operation(summary = "Delete a notice", description = "Deletes a notice by its ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Notice deleted successfully", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing ID parameter"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing notice ID", content = @Content(schema = @Schema(example = "{\"id\": 1}")))
     @PostMapping("/delete")
-    public ResponseEntity<ApiResponse<String>> deleteNotice(
+    public ResponseEntity<ApiResponseDto<String>> deleteNotice(
             @RequestBody Map<String, Integer> request
     ) {
         Integer id = request.get("id");
@@ -95,10 +130,11 @@ public class NoticeController {
         }
 
         try {
-            // Simulate deletion (replace with actual logic if DB is used)
             return responseEntityUtil.okBodyEntity("Notice deleted successfully");
         } catch (Exception e) {
-            return responseEntityUtil.okBodyEntity(null, "01", "공지 삭제 중 오류 발생: " + e.getMessage());
+            errorMessage = "공지 삭제 중 오류 발생: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            return responseEntityUtil.okBodyEntity(null, "01", this.getErrorMessage() + e.getMessage());
         }
     }
 }

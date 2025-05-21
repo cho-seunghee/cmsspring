@@ -1,7 +1,11 @@
 package com.boot.cms;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.Getter;
+import lombok.Setter;
 import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -11,9 +15,12 @@ import java.util.Map;
 @SpringBootApplication
 @MapperScan("com.boot.cms.mapper.**")
 public class CmsApplication {
+	private static final Logger logger = LoggerFactory.getLogger(CmsApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(CmsApplication.class);
+
+		String errorMessage;
 
 		// Set default profile to 'dev' if not specified
 		Map<String, Object> defaultProperties = new HashMap<>();
@@ -39,13 +46,19 @@ public class CmsApplication {
 
 			// Validate critical variables
 			if (dotenv.get("SPRING_DATASOURCE_USERNAME") == null || dotenv.get("SPRING_DATASOURCE_PASSWORD") == null) {
-				System.err.println("ERROR: SPRING_DATASOURCE_USERNAME and SPRING_DATASOURCE_PASSWORD must be set in .env");
+				errorMessage = "ERROR: SPRING_DATASOURCE_USERNAME and SPRING_DATASOURCE_PASSWORD must be set in .env";
+				logger.error(errorMessage);
+				System.err.println(errorMessage);
 			}
 		} catch (Exception e) {
-			System.out.println("No .env file found or failed to load: " + e.getMessage());
+			errorMessage = "No .env file found or failed to load: ";
+			logger.error(errorMessage, e.getMessage(), e);
+			System.out.println(errorMessage + e.getMessage());
 			// Check system environment variables
 			if (System.getenv("SPRING_DATASOURCE_USERNAME") == null || System.getenv("SPRING_DATASOURCE_PASSWORD") == null) {
-				System.err.println("ERROR: SPRING_DATASOURCE_USERNAME and SPRING_DATASOURCE_PASSWORD must be set");
+				errorMessage = "ERROR: SPRING_DATASOURCE_USERNAME and SPRING_DATASOURCE_PASSWORD must be set";
+				logger.error(errorMessage);
+				System.out.println(errorMessage);
 			}
 		}
 

@@ -1,7 +1,7 @@
 package com.boot.cms.controller.auth;
 
 import com.boot.cms.aspect.ClientIPAspect;
-import com.boot.cms.dto.common.ApiResponse;
+import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.entity.auth.LoginEntity;
 import com.boot.cms.entity.auth.LoginResultEntity;
 import com.boot.cms.service.auth.LoginResultService;
@@ -9,9 +9,19 @@ import com.boot.cms.service.auth.LoginService;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,15 +34,28 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Login", description = "Endpoint for user login")
 public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     private final LoginService loginService;
     private final JwtUtil jwtUtil;
     private final ResponseEntityUtil responseEntityUtil;
     private final LoginResultService loginResultService;
 
+    @Setter
+    @Getter
+    String errorMessage;
+
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token in a cookie")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or missing credentials"),
+            @ApiResponse(responseCode = "500", description = "Server error")
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing employee number and password", content = @Content(schema = @Schema(example = "{\"empNo\": \"admin\", \"empPwd\": \"password\"}")))
     @PostMapping("login")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> login(
+    public ResponseEntity<ApiResponseDto<Map<String, Object>>> login(
             @RequestBody Map<String, String> request,
             HttpServletResponse response) {
         String empNo = request.get("empNo");
@@ -80,9 +103,10 @@ public class LoginController {
                 return responseEntityUtil.okBodyEntity(null, "01", "아이디 또는 비밀번호가 잘못되었습니다.");
             }
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage());
-            return responseEntityUtil.errBodyEntity("로그인 처리 중 오류 발생: " + e.getMessage(), 500);
-
+            errorMessage = "로그인 처리 중 오류 발생: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            System.out.println(this.getErrorMessage() + e.getMessage());
+            return responseEntityUtil.errBodyEntity(this.getErrorMessage() + e.getMessage(), 500);
         }
     }
 }

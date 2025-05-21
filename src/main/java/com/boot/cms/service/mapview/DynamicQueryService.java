@@ -1,6 +1,8 @@
 package com.boot.cms.service.mapview;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -22,6 +24,10 @@ public class DynamicQueryService {
     private static final Logger logger = LoggerFactory.getLogger(DynamicQueryService.class);
 
     private final DataSource dataSource;
+
+    @Setter
+    @Getter
+    String errorMessage;
 
     private String createCallString(String procedureName, int paramCount) {
         String placeholders = String.join(",", Collections.nCopies(paramCount, "?"));
@@ -73,7 +79,8 @@ public class DynamicQueryService {
             }
 
         } catch (Exception e) {
-            logger.error("Error executing stored procedure: {}, Error: {}", procedureCall, e.getMessage(), e);
+            errorMessage = "Error executing stored procedure: {}, Error: {}";
+            logger.error(this.getErrorMessage(), procedureCall, e.getMessage(), e);
             throw new IllegalArgumentException("데이터베이스 오류: " + e.getMessage());
         } finally {
             try {
@@ -81,7 +88,8 @@ public class DynamicQueryService {
                 if (stmt != null) stmt.close();
                 DataSourceUtils.releaseConnection(connection, dataSource);
             } catch (Exception e) {
-                logger.error("Error closing resources: {}", e.getMessage());
+                errorMessage = "Error closing resources: {}";
+                logger.error(this.getErrorMessage(), e.getMessage(), e);
             }
         }
 
@@ -94,7 +102,8 @@ public class DynamicQueryService {
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
             if (columnCount == 0) {
-                logger.warn("No columns found in ResultSet");
+                errorMessage = "No columns found in ResultSet";
+                logger.warn(this.getErrorMessage());
                 columnNames.add("col1");
                 return columnNames;
             }
@@ -103,7 +112,8 @@ public class DynamicQueryService {
                 columnNames.add(columnName);
             }
         } catch (Exception e) {
-            logger.error("Failed to extract column names: {}", e.getMessage());
+            errorMessage = "Failed to extract column names: {}";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
             columnNames.add("col1");
         }
         return columnNames;

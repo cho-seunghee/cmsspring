@@ -1,9 +1,13 @@
 package com.boot.cms.util;
 
+import com.boot.cms.service.auth.LoginResultService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.Cookie;
@@ -14,6 +18,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @Getter
     private final Key signingKey;
@@ -26,15 +31,23 @@ public class JwtUtil {
     @Value("${COOKIE_SAMESITE:Lax}")
     private String cookieSameSite;
 
+    @Setter
+    @Getter
+    String errorMessage;
+
     public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") long expirationTime) {
         byte[] keyBytes;
         try {
             keyBytes = Base64.getDecoder().decode(secretKey);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Base64 encoded jwt.secret", e);
+            errorMessage = "Invalid Base64 encoded jwt.secret: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            throw new IllegalArgumentException(this.getErrorMessage(), e);
         }
         if (keyBytes.length < 32) {
-            throw new IllegalArgumentException("Secret key must be at least 256 bits");
+            errorMessage = "Secret key must be at least 256 bits";
+            logger.error(this.getErrorMessage());
+            throw new IllegalArgumentException(this.getErrorMessage());
         }
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationTime = expirationTime;
@@ -61,7 +74,9 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Invalid or expired token: " + e.getMessage(), e);
+            errorMessage = "Invalid or expired token: ";
+            logger.error(this.getErrorMessage(), e.getMessage(), e);
+            throw new RuntimeException(this.getErrorMessage() + e.getMessage(), e);
         }
     }
 

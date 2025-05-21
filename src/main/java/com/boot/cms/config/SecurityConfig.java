@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/api/**")
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/mapview/**").permitAll()
@@ -84,6 +85,8 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/v3/api-docs/**", configuration); // CORS for Swagger
+        source.registerCorsConfiguration("/swagger-ui/**", configuration); // CORS for Swagger UI
         return source;
     }
 
