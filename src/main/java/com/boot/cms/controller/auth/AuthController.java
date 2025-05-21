@@ -75,16 +75,20 @@ public class AuthController {
     @GetMapping("check")
     public ResponseEntity<ApiResponse<Map<String, Object>>> check(HttpServletRequest request) {
         String token = jwtUtil.getTokenFromCookie(request);
+        System.out.println("Received token in /api/auth/check: " + token);
         if (token == null) {
+            System.out.println("No token found in cookie for /api/auth/check");
             return responseEntityUtil.errBodyEntity("Missing token", 401);
         }
 
         try {
             Claims claims = jwtUtil.validateToken(token);
+            System.out.println("Validated claims: " + claims);
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("success", true);
             return responseEntityUtil.okBodyEntity(responseData);
         } catch (Exception e) {
+            System.out.println("Token validation failed in /api/auth/check: " + e.getMessage());
             return responseEntityUtil.errBodyEntity("Invalid token: " + e.getMessage(), 401);
         }
     }

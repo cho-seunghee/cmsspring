@@ -17,10 +17,14 @@ public class JwtUtil {
 
     @Getter
     private final Key signingKey;
+    @Getter
     private final long expirationTime;
 
     @Value("${COOKIE_SECURE:false}")
     private boolean cookieSecure;
+
+    @Value("${COOKIE_SAMESITE:Lax}")
+    private String cookieSameSite;
 
     public JwtUtil(@Value("${jwt.secret}") String secretKey, @Value("${jwt.expiration}") long expirationTime) {
         byte[] keyBytes;
@@ -34,10 +38,6 @@ public class JwtUtil {
         }
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
         this.expirationTime = expirationTime;
-    }
-
-    public long getExpirationTime() {
-        return expirationTime;
     }
 
     public String generateToken(String empNo, String auth, String empNm) {
@@ -81,16 +81,15 @@ public class JwtUtil {
         Cookie jwtCookie = new Cookie("jwt_token", token);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge((int) (expirationTime / 1000)); // Match token expiration
+        jwtCookie.setMaxAge(token == null ? 0 : (int) (expirationTime / 1000));
         jwtCookie.setSecure(cookieSecure); // Set to true in production (HTTPS)
-        jwtCookie.setAttribute("SameSite", "Lax");
+        jwtCookie.setAttribute("SameSite", cookieSameSite); // Required for cross-origin
         return jwtCookie;
     }
 
     // Deprecated: Kept for backward compatibility but not used with cookies
     @Deprecated
     public String getTokenFromHeader() {
-        // Existing header-based method (not used)
         return null;
     }
 }

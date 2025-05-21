@@ -1,5 +1,7 @@
 package com.boot.cms.config;
 
+import com.boot.cms.entity.auth.LoginEntity;
+import com.boot.cms.mapper.auth.LoginMapper;
 import com.boot.cms.security.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -7,6 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -15,14 +20,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.core.env.Environment;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 public class SecurityConfig {
 
     private final Environment environment;
+    private final LoginMapper loginMapper;
 
-    public SecurityConfig(Environment environment) {
+    public SecurityConfig(Environment environment, LoginMapper loginMapper) {
         this.environment = environment;
+        this.loginMapper = loginMapper;
     }
 
     @Value("${cors.allowed-origins}")
@@ -75,7 +83,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration); // `/api/**` URL에 CORS 설정 적용
+        source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
 
@@ -84,7 +92,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         String[] originsArray = allowedOrigins.split(",");
-        System.out.println("allowedOrigins: " + String.join(", ", originsArray)); // 디버깅 로그
+        System.out.println("allowedOrigins: " + String.join(", ", originsArray));
 
         for (String origin : originsArray) {
             String trimmedOrigin = origin.trim();
@@ -98,5 +106,20 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
 
         return configuration;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            LoginEntity user = loginMapper.loginCheck(username, null); // Password not needed for JWT
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found: " + username);
+            }
+            return new User(
+                    user.getEmpNo(),
+                    user.getEmpPwd(),
+                    Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getAuth()))
+            );
+        };
     }
 }
