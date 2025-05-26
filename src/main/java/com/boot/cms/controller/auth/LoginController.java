@@ -6,15 +6,12 @@ import com.boot.cms.entity.auth.LoginEntity;
 import com.boot.cms.entity.auth.LoginResultEntity;
 import com.boot.cms.service.auth.LoginResultService;
 import com.boot.cms.service.auth.LoginService;
+import com.boot.cms.util.CommonApiResponses;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -34,7 +31,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Login", description = "Endpoint for user login")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Login", description = "Endpoint for user login")
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -47,13 +44,7 @@ public class LoginController {
     @Getter
     String errorMessage;
 
-    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token in a cookie")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid or missing credentials"),
-            @ApiResponse(responseCode = "500", description = "Server error")
-    })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing employee number and password", content = @Content(schema = @Schema(example = "{\"empNo\": \"admin\", \"empPwd\": \"password\"}")))
+    @CommonApiResponses
     @PostMapping("login")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> login(
             @RequestBody Map<String, String> request,

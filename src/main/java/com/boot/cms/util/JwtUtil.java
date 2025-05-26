@@ -3,6 +3,7 @@ package com.boot.cms.util;
 import com.boot.cms.service.auth.LoginResultService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.Setter;

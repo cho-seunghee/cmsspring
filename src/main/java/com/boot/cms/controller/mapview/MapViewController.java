@@ -2,14 +2,11 @@ package com.boot.cms.controller.mapview;
 
 import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.service.mapview.MapViewProcessor;
+import com.boot.cms.util.CommonApiResponses;
 import com.boot.cms.util.EscapeUtil;
 import com.boot.cms.util.ResponseEntityUtil;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/mapview")
 @RequiredArgsConstructor
-@Tag(name = "Map View", description = "Endpoint for dynamic map view data retrieval")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Map View", description = "Endpoint for dynamic map view data retrieval")
 public class MapViewController {
     private static final Logger logger = LoggerFactory.getLogger(MapViewController.class);
 
@@ -40,13 +37,7 @@ public class MapViewController {
     @Getter
     String errorMessage;
 
-    @Operation(summary = "Retrieve dynamic map view data", description = "Processes dynamic view data based on report code, job type, and parameters")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Data retrieved successfully", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid or missing rptCd parameter"),
-            @ApiResponse(responseCode = "404", description = "No data found")
-    })
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing report code and parameters", content = @Content(schema = @Schema(example = "{\"rptCd\": \"REPORT1\", \"jobGb\": \"GET\", \"empNo\": \"admin\", \"param1\": \"value1\"}")))
+    @CommonApiResponses
     @PostMapping("/call")
     public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> callDynamicView(
             @RequestBody Map<String, String> request

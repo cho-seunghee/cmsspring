@@ -3,17 +3,13 @@ package com.boot.cms.controller.auth;
 import com.boot.cms.aspect.ClientIPAspect;
 import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.service.auth.AuthService;
+import com.boot.cms.util.CommonApiResponses;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Endpoints for user authentication and session management")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Authentication", description = "Endpoints for user authentication and session management")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -43,12 +39,7 @@ public class AuthController {
     @Getter
     String errorMessage;
 
-    @Operation(summary = "Check user session", description = "Validates the JWT token from the cookie and returns session status")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Session is valid", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "Missing or invalid token")
-    })
-    @SecurityRequirement(name = "bearerAuth")
+    @CommonApiResponses
     @GetMapping("check")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> check(HttpServletRequest request) {
         String token = jwtUtil.getTokenFromCookie(request);
@@ -70,12 +61,7 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Extend user session", description = "Validates the current JWT token and optionally extends the session by issuing a new token")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Session validated or extended", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "Missing or invalid token")
-    })
-    @SecurityRequirement(name = "bearerAuth")
+    @CommonApiResponses
     @GetMapping("live")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> live(
             HttpServletRequest request,
@@ -124,10 +110,7 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Logout user", description = "Invalidates the JWT token by setting the cookie to expire")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully logged out", content = @Content(schema = @Schema(implementation = ApiResponseDto.class)))
-    })
+    @CommonApiResponses
     @PostMapping("logout")
     public ResponseEntity<ApiResponseDto<Map<String, Object>>> logout(HttpServletResponse response) {
         Cookie jwtCookie = jwtUtil.createJwtCookie(null);

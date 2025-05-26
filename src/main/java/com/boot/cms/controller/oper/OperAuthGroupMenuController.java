@@ -3,17 +3,13 @@ package com.boot.cms.controller.oper;
 import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.service.mapview.MapViewProcessor;
 import com.boot.cms.service.oper.OperAuthGroupMenuService;
+import com.boot.cms.util.CommonApiResponses;
 import com.boot.cms.util.EscapeUtil;
 import com.boot.cms.util.MapViewParamsUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -33,7 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/oper/menuauthinfo")
 @RequiredArgsConstructor
-@Tag(name = "Operational Menu Authorization", description = "Endpoints for managing operational menu authorization data")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Operational Menu Authorization", description = "Endpoints for managing operational menu authorization data")
 public class OperAuthGroupMenuController {
 
     private static final Logger logger = LoggerFactory.getLogger(OperAuthGroupMenuController.class);
@@ -48,15 +44,7 @@ public class OperAuthGroupMenuController {
     @Getter
     String errorMessage;
 
-    @Operation(summary = "List menu authorization data", description = "Retrieves menu authorization data for operational groups")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Data retrieved successfully", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "No data found")
-    })
-    @SecurityRequirement(name = "bearerAuth")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing parameters", content = @Content(schema = @Schema(example = "{\"params\": {\"filter\": \"F\"}}")))
+    @CommonApiResponses
     @PostMapping("/list")
     public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> menuAuthList(
             @RequestBody Map<String, Object> request,
@@ -99,15 +87,7 @@ public class OperAuthGroupMenuController {
         return responseEntityUtil.okBodyEntity(unescapedResultList);
     }
 
-    @Operation(summary = "Save menu authorization data", description = "Saves or updates menu authorization data for operational groups")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Data saved successfully", content = @Content(schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid parameters"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "No data processed")
-    })
-    @SecurityRequirement(name = "bearerAuth")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing authorization data", content = @Content(schema = @Schema(example = "{\"params\": [{\"menuId\": \"MENU1\", \"auth\": \"READ\"}]}")))
+    @CommonApiResponses
     @PostMapping("/save")
     public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> menuAuthSave(
             @RequestBody Map<String, Object> request,

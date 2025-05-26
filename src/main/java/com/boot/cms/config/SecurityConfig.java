@@ -49,21 +49,21 @@ public class SecurityConfig {
         }
 
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**")
-                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))  // CSRF 예외 처리
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/mapview/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                        .permitAll() // Swagger UI와 OpenAPI Docs 허용
+                        .requestMatchers("/api/public/**", "/api/auth/**")
+                        .permitAll() // 공개 API 허용
+                        .requestMatchers("/api/**")
+                        .authenticated() // /api/** 인증 필요
+                        .anyRequest()
+                        .authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((req, res, e) -> {
+                        .authenticationEntryPoint((req, res, e) -> {  // 인증 실패 처리
                             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             res.setContentType("application/json");
                             res.getWriter().write("{\"success\": false, \"message\": \"Unauthorized\"}");
@@ -106,7 +106,8 @@ public class SecurityConfig {
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // Swagger에서 authorization 읽기 가능하도록
+        configuration.setAllowCredentials(true); // JWT 같은 인증 데이터를 허용
 
         return configuration;
     }
