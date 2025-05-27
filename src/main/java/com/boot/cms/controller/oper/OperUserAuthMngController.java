@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/oper/menumng")
+@RequestMapping("api/oper/usermng")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Operational Menu Management", description = "Endpoints for managing operational menu data")
-public class OperMenuMngController {
-    private static final Logger logger = LoggerFactory.getLogger(OperMenuMngController.class);
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Operational User Management", description = "Endpoints for managing operational user data")
+public class OperUserAuthMngController {
+    private static final Logger logger = LoggerFactory.getLogger(OperUserAuthMngController.class);
 
     private final MapViewProcessor mapViewProcessor;
     private final ResponseEntityUtil responseEntityUtil;
@@ -44,7 +44,7 @@ public class OperMenuMngController {
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "OPERMENUMNG";
+        String rptCd = "USERAUTHMNG";
         String jobGb = "GET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
@@ -74,7 +74,7 @@ public class OperMenuMngController {
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "OPERMENUMNGTRAN";
+        String rptCd = "USERAUTHMNGTRAN";
         String jobGb = "SET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
