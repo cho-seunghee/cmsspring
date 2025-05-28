@@ -1,11 +1,8 @@
-package com.boot.cms.controller.oper;
+package com.boot.cms.controller.auth;
 
 import com.boot.cms.dto.common.ApiResponseDto;
 import com.boot.cms.service.mapview.MapViewProcessor;
-import com.boot.cms.util.CommonApiResponses;
-import com.boot.cms.util.EscapeUtil;
-import com.boot.cms.util.MapViewParamsUtil;
-import com.boot.cms.util.ResponseEntityUtil;
+import com.boot.cms.util.*;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -23,11 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/oper/usermng")
+@RequestMapping("api/auth")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "3.시스템관리 > 사용자권한관리", description = "사용자권한을 관리하는 API")
-public class OperUserAuthMngController {
-    private static final Logger logger = LoggerFactory.getLogger(OperUserAuthMngController.class);
+@io.swagger.v3.oas.annotations.tags.Tag(name = "1.LOGIN > 비밀번호변경", description = "비밀번호 변경에 대한 API")
+public class PasswordChangeController {
+    private static final Logger logger = LoggerFactory.getLogger(PasswordChangeController.class);
 
     private final MapViewProcessor mapViewProcessor;
     private final ResponseEntityUtil responseEntityUtil;
@@ -39,16 +36,22 @@ public class OperUserAuthMngController {
     String errorMessage;
 
     @CommonApiResponses
-    @PostMapping("/list")
-    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> menuMngList(
+    @PostMapping("/password/list")
+    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> passwordList(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "USERAUTHMNG";
+        String rptCd = "USERPASSWORDCHANGE";
         String jobGb = "GET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
         String empNo = claims != null && claims.getSubject() != null ? claims.getSubject() : null;
+        empNo = "pwdChk"; //인증 체크 패스를 위한 값
+
+        if (request.containsKey("pEMPPWD") && request.get("pEMPPWD") != null) {
+            String encryptedPassword = Sha256Util.encrypt(request.get("pEMPPWD").toString());
+            request.put("pEMPPWD", encryptedPassword);
+        }
 
         List<String> params = mapViewParamsUtil.getParams(request, escapeUtil);
 
@@ -69,16 +72,22 @@ public class OperUserAuthMngController {
     }
 
     @CommonApiResponses
-    @PostMapping("/save")
-    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> menuMngSave(
+    @PostMapping("/password/save")
+    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> passwordSave(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
-        String rptCd = "USERAUTHMNGTRAN";
+        String rptCd = "USERPASSWORDCHANGETRAN";
         String jobGb = "SET";
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
         String empNo = claims != null && claims.getSubject() != null ? claims.getSubject() : null;
+        empNo = "pwdChk"; //인증 체크 패스를 위한 값
+
+        if (request.containsKey("pEMPPWD") && request.get("pEMPPWD") != null) {
+            String encryptedPassword = Sha256Util.encrypt(request.get("pEMPPWD").toString());
+            request.put("pEMPPWD", encryptedPassword);
+        }
 
         List<String> params = mapViewParamsUtil.getParams(request, escapeUtil);
 

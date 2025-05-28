@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Menu Authorization", description = "Endpoint for retrieving user menu permissions")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "1.LOGIN > 메뉴", description = "사용자에 대한 메뉴 리스트 API")
 public class AuthMenuController {
     private final AuthMenuMapper authMenuMapper;
     private final AuthMenuService authMenuService;

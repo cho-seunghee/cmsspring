@@ -10,8 +10,6 @@ import com.boot.cms.util.CommonApiResponses;
 import com.boot.cms.util.JwtUtil;
 import com.boot.cms.util.ResponseEntityUtil;
 import io.jsonwebtoken.Claims;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -31,7 +29,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Login", description = "Endpoint for user login")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "1.LOGIN > 로그인", description = "사용자 로그인 관리 API")
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
@@ -83,6 +81,8 @@ public class LoginController {
                 userInfo.put("empNo", loginEntity.getEmpNo());
                 userInfo.put("empNm", loginEntity.getEmpNm());
                 userInfo.put("auth", loginEntity.getAuth());
+                userInfo.put("orgCd", loginEntity.getOrgCd());
+                userInfo.put("pwdChgYn", loginEntity.getPwdChgYn());
                 userInfo.put("ip", clientIP);
 
                 Map<String, Object> responseData = new HashMap<>();

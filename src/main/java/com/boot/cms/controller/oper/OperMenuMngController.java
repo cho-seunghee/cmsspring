@@ -25,7 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/oper/menumng")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Operational Menu Management", description = "Endpoints for managing operational menu data")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "3.시스템관리 > 메뉴관리", description = "메뉴를 관리하는 API")
 public class OperMenuMngController {
     private static final Logger logger = LoggerFactory.getLogger(OperMenuMngController.class);
 

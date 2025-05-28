@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/mapviewfile")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Map View File", description = "Endpoint for dynamic map view file data processing")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "9.테스트 > Map View File", description = "MAP VIEW FILE을 통한 프로시저 호출 테스트 API")
 public class MapViewFileController {
 
     private static final Logger logger = LoggerFactory.getLogger(MapViewFileController.class);

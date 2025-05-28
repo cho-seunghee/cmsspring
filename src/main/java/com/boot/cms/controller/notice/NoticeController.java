@@ -27,7 +27,7 @@ import java.util.*;
 @RestController
 @RequestMapping("api/notice")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Notices", description = "Endpoints for managing notice data and files")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "2.MAIN > 공지사항관리", description = "공지사항을 관리하는 API")
 public class NoticeController {
     private static final Logger logger = LoggerFactory.getLogger(NoticeController.class);
 

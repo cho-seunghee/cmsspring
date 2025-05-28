@@ -26,7 +26,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Join", description = "Endpoints for managing Join data")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "1.LOGIN > 회원가입", description = "회원가입 API")
 public class JoinController {
     private static final Logger logger = LoggerFactory.getLogger(JoinController.class);
 
@@ -50,7 +50,7 @@ public class JoinController {
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
         String empNo = claims != null && claims.getSubject() != null ? claims.getSubject() : null;
-        empNo = "join";
+        empNo = "joinCheck";  //인증 체크 패스를 위한 값
 
         List<String> params = mapViewParamsUtil.getParams(request, escapeUtil);
 
@@ -72,7 +72,7 @@ public class JoinController {
 
     @CommonApiResponses
     @PostMapping("/join/save")
-    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> menuMngSave(
+    public ResponseEntity<ApiResponseDto<List<Map<String, Object>>>> joinSave(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest
     ) {
@@ -81,7 +81,7 @@ public class JoinController {
 
         Claims claims = (Claims) httpRequest.getAttribute("user");
         String empNo = claims != null && claims.getSubject() != null ? claims.getSubject() : null;
-        empNo = "join";
+        empNo = "joinCheck";  //인증 체크 패스를 위한 값
 
         // Encrypt pEMPPWD if it exists in the request, preserving its position
         if (request.containsKey("pEMPPWD") && request.get("pEMPPWD") != null) {

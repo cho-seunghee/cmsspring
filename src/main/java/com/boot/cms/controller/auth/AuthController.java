@@ -27,7 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Authentication", description = "Endpoints for user authentication and session management")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "1.LOGIN > 인증관리", description = "인증 및 session 관리 API")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 

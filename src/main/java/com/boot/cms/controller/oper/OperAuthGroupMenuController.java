@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/oper/menuauthinfo")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Operational Menu Authorization", description = "Endpoints for managing operational menu authorization data")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "3.시스템관리 > 메뉴별권한정보관리", description = "메뉴별 권한정보 관리하는 API")
 public class OperAuthGroupMenuController {
 
     private static final Logger logger = LoggerFactory.getLogger(OperAuthGroupMenuController.class);
