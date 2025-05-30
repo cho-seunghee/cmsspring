@@ -46,7 +46,7 @@ public class MapViewFileController {
     ) {
         String rptCd = (String) request.get("rptCd");
         String jobGb = (String) request.getOrDefault("jobGb", "SET");
-        String empNo = (String) request.getOrDefault("empNo", "admin");
+        String empNo = (String) request.getOrDefault("empNo", "mapviewFile");
 
         if (rptCd == null || rptCd.isEmpty()) {
             return responseEntityUtil.okBodyEntity(null, "01", "rptCd parameter is required.");

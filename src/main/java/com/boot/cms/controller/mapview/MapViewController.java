@@ -44,7 +44,7 @@ public class MapViewController {
     ) {
         String rptCd = request.get("rptCd");
         String jobGb = request.getOrDefault("jobGb", "GET");
-        String empNo = request.getOrDefault("empNo", "admin");
+        String empNo = request.getOrDefault("empNo", "mapview");
 
         if (rptCd == null || rptCd.isEmpty()) {
             return responseEntityUtil.okBodyEntity(null, "01", "파라미터가 잘못되어 있습니다.");
