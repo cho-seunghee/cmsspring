@@ -70,6 +70,12 @@ dependencies {
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
 
+	// Apache POI 의존성 추가
+	implementation "org.apache.poi:poi:${apachePoiVersion}"
+	implementation "org.apache.poi:poi-ooxml:${apachePoiVersion}" // XLSX 포맷 지원
+	implementation "org.apache.xmlbeans:xmlbeans:5.1.1"
+	implementation "org.apache.xmlbeans:xmlbeans:${xmlBeansVersion}" // XML 포맷 지원
+
 	// 테스트 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'      // 기본 테스트
 	testImplementation "org.mybatis.spring.boot:mybatis-spring-boot-starter-test:${mybatisVersion}" // MyBatis 테스트
