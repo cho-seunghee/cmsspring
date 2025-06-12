@@ -30,7 +30,7 @@ import java.util.*;
 @RestController
 @RequestMapping("api/excelupload/template")
 @RequiredArgsConstructor
-@io.swagger.v3.oas.annotations.tags.Tag(name = "2.MAIN > 엑셀업로드템플릿관리", description = "엑셀업로드템플릿을 관리하는 API")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "3.시스템관리 > 엑셀업로드템플릿관리", description = "엑셀업로드템플릿을 관리하는 API")
 public class ExcelUploadTemplateController {
     private static final Logger logger = LoggerFactory.getLogger(ExcelUploadTemplateController.class);
 
@@ -76,8 +76,8 @@ public class ExcelUploadTemplateController {
     }
 
     @CommonApiResponses
-    @PostMapping(value = "/filesave", consumes = {"multipart/form-data"})
-    public ResponseEntity<ApiResponseDto<List<MapViewFileEntity>>> excelUploadTempFileSave(
+    @PostMapping(value = "/fileupload", consumes = {"multipart/form-data"})
+    public ResponseEntity<ApiResponseDto<List<MapViewFileEntity>>> excelUploadTempFileUpload(
             String gubun,
             String fileId,
             String title,
@@ -86,15 +86,15 @@ public class ExcelUploadTemplateController {
 
         // Validate required parameters
         if (gubun == null || gubun.trim().isEmpty() || title == null || title.trim().isEmpty()) {
-            return responseEntityUtil.okBodyEntity(null, "01", "gubun and title are required.");
+            return responseEntityUtil.okBodyEntity(null, "01", "필수파라미터가 잘못되어 있습니다.");
         }
 
         if (files == null || files.length == 0) {
-            return responseEntityUtil.okBodyEntity(new ArrayList<>(), "00", "No files provided.");
+            return responseEntityUtil.okBodyEntity(new ArrayList<>(), "01", "파일이 필요합니다.");
         }
 
         if (files.length > fileConfig.getMaxFilesPerUpload()) {
-            return responseEntityUtil.okBodyEntity(null, "01", "Too many files, maximum " + fileConfig.getMaxFilesPerUpload() + " allowed.");
+            return responseEntityUtil.okBodyEntity(null, "01", "파일 크기가 " + (fileConfig.getMaxFileSize() / (1024 * 1024)) + "MB 제한을 초과했습니다.");
         }
 
         String rptCd = "EXCELUPLOADTEMPFILETRAN";
@@ -163,8 +163,9 @@ public class ExcelUploadTemplateController {
         }
     }
 
-    @PostMapping(value = "/filedelete")
-    public ResponseEntity<ApiResponseDto<List<MapViewFileEntity>>> excelUploadTempFileDelete(
+    @CommonApiResponses
+    @PostMapping(value = "/filesave")
+    public ResponseEntity<ApiResponseDto<List<MapViewFileEntity>>> excelUploadTempFileSave(
             @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest) {
 
@@ -175,10 +176,6 @@ public class ExcelUploadTemplateController {
         // Validate required parameters
         if (gubun == null || gubun.trim().isEmpty() || fileId == null || fileId.trim().isEmpty()) {
             return responseEntityUtil.okBodyEntity(null, "01", "gubun and fileId are required.");
-        }
-
-        if (!"D".equals(gubun)) {
-            return responseEntityUtil.okBodyEntity(null, "01", "Invalid gubun value for deletion. Must be 'D'.");
         }
 
         String rptCd = "EXCELUPLOADTEMPFILETRAN";

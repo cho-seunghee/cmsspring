@@ -225,15 +225,15 @@ public class NoticeController {
 
         // Validate required parameters
         if (gubun == null || gubun.trim().isEmpty() || noticeId == null || noticeId.trim().isEmpty()) {
-            return responseEntityUtil.okBodyEntity(null, "01", "gubun and noticeId are required.");
+            return responseEntityUtil.okBodyEntity(null, "01", "필수파라미터가 잘못되어 있습니다.");
         }
 
         if (files == null || files.length == 0) {
-            return responseEntityUtil.okBodyEntity(new ArrayList<>(), "00", "No files provided.");
+            return responseEntityUtil.okBodyEntity(new ArrayList<>(), "01", "파일이 필요합니다.");
         }
 
         if (files.length > fileConfig.getMaxFilesPerUpload()) {
-            return responseEntityUtil.okBodyEntity(null, "01", "Too many files, maximum " + fileConfig.getMaxFilesPerUpload() + " allowed.");
+            return responseEntityUtil.okBodyEntity(null, "01", "파일 크기가 " + (fileConfig.getMaxFileSize() / (1024 * 1024)) + "MB 제한을 초과했습니다.");
         }
 
         String rptCd = "NOTICEFILETRAN";
