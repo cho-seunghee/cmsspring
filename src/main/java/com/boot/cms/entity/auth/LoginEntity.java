@@ -9,6 +9,7 @@ public class LoginEntity {
     private String empPwd;
     private String auth;
     private String orgCd;
+    private String orgNm;
     private String pwdChgYn;
     private String clientIP;
 }

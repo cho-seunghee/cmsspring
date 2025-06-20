@@ -77,11 +77,15 @@ public class AuthController {
             String empNo = claims.getSubject();
             String auth = claims.get("auth", String.class);
             String empNm = claims.get("empNm", String.class);
+            String orgCd = claims.get("orgCd", String.class);
+            String orgNm = claims.get("orgNm", String.class);
 
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("empNo", empNo);
             userInfo.put("empNm", empNm);
             userInfo.put("auth", auth);
+            userInfo.put("orgCd", orgCd);
+            userInfo.put("orgNm", orgNm);
             userInfo.put("ip", ClientIPAspect.getClientIP());
 
             Map<String, Object> responseData = new HashMap<>();
@@ -90,7 +94,7 @@ public class AuthController {
             responseData.put("expiresAt", expiresAt);
 
             if (extend) {
-                String newToken = jwtUtil.generateToken(empNo, auth, empNm);
+                String newToken = jwtUtil.generateToken(empNo, auth, empNm, orgCd, orgNm);
                 Cookie jwtCookie = jwtUtil.createJwtCookie(newToken);
                 response.addCookie(jwtCookie);
 

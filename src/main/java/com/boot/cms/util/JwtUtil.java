@@ -54,13 +54,15 @@ public class JwtUtil {
         this.expirationTime = expirationTime;
     }
 
-    public String generateToken(String empNo, String auth, String empNm) {
+    public String generateToken(String empNo, String auth, String empNm, String orgCd, String orgNm) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
         return Jwts.builder()
                 .setSubject(empNo)
                 .claim("auth", auth)
                 .claim("empNm", empNm)
+                .claim("orgCd", orgCd)
+                .claim("orgNm", orgNm)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(signingKey)
