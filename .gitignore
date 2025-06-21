@@ -12,8 +12,9 @@
 .env.dev
 
 # Gradle 캐시
-.gradle/build/
-.gradle/cache/
+.gradle/
+# Gradle Wrapper 파일은 포함
+!gradle/wrapper/
 
 # IDE 관련 파일
 .idea/
