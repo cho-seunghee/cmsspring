@@ -1,0 +1,112 @@
+{
+  "licenses": [
+    {
+      "library": "Spring Boot",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot Starter Web",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot Starter Data JPA",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io/projects/spring-data-jpa",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot Starter Data Redis",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io/projects/spring-data-redis",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot Starter AOP",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot Starter Security",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io/projects/spring-security",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "Spring Boot DevTools",
+      "license": "Apache License 2.0",
+      "url": "https://spring.io",
+      "copyright": "Copyright © The Spring Team"
+    },
+    {
+      "library": "SpringDoc OpenAPI",
+      "license": "Apache License 2.0",
+      "url": "https://springdoc.org/",
+      "copyright": "Copyright © 2023 SpringDoc"
+    },
+    {
+      "library": "Jackson Databind",
+      "license": "Apache License 2.0",
+      "url": "https://github.com/FasterXML/jackson",
+      "copyright": "Copyright © FasterXML"
+    },
+    {
+      "library": "Thymeleaf",
+      "license": "Apache License 2.0",
+      "url": "https://www.thymeleaf.org/",
+      "copyright": "Copyright © Daniel Fernández"
+    },
+    {
+      "library": "MyBatis Spring Boot Starter",
+      "license": "Apache License 2.0",
+      "url": "https://mybatis.org/spring-boot-starter/",
+      "copyright": "Copyright © MyBatis Project"
+    },
+    {
+      "library": "JJWT (Java JWT)",
+      "license": "Apache License 2.0",
+      "url": "https://github.com/jwtk/jjwt",
+      "copyright": "Copyright © JJWT"
+    },
+    {
+      "library": "Apache POI",
+      "license": "Apache License 2.0",
+      "url": "https://poi.apache.org/",
+      "copyright": "Copyright © The Apache Software Foundation"
+    },
+    {
+      "library": "XmlBeans",
+      "license": "Apache License 2.0",
+      "url": "https://xmlbeans.apache.org/",
+      "copyright": "Copyright © The Apache Software Foundation"
+    },
+    {
+      "library": "MariaDB Java Client",
+      "license": "LGPL v2.1",
+      "url": "https://mariadb.org/",
+      "copyright": "Copyright © MariaDB"
+    },
+    {
+      "library": "Lombok",
+      "license": "MIT License",
+      "url": "https://projectlombok.org/",
+      "copyright": "Copyright © The Project Lombok Authors"
+    },
+    {
+      "library": "Java Dotenv",
+      "license": "MIT License",
+      "url": "https://github.com/cdimascio/java-dotenv",
+      "copyright": "Copyright © 2017-2023 cdimascio"
+    },
+    {
+      "library": "JUnit Platform Launcher",
+      "license": "Eclipse Public License 2.0",
+      "url": "https://junit.org/junit5/",
+      "copyright": "Copyright © Eclipse Foundation"
+    }
+  ]
+}
